@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla Weather App</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #eef1f4;
+        color: #2f3640;
+        margin: 0;
+        padding: 0;
+      }
+
+      .weather-app {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      input[type="search"] {
+        padding: 10px;
+        font-size: 16px;
+        width: 70%;
+      }
+
+      button {
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      main {
+        text-align: center;
+      }
+
+      .temp-icon img {
+        width: 60px;
+        vertical-align: middle;
+      }
+
+      .temp-info {
+        font-size: 36px;
+        margin: 10px 0;
+      }
+
+      .extra-info {
+        margin-top: 10px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+      }
+
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="weather-app">
+      <header>
+        <form id="search-form">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Enter a city..."
+            required
+          />
+          <button type="submit">Search</button>
+        </form>
+      </header>
+
+      <main>
+        <h1 id="current-city">City</h1>
+        <p id="current-date">Loading date...</p>
+        <div class="weather-details">
+          <div class="temp-icon">
+            <img src="" alt="Weather icon" id="weather-icon" />
+            <span id="weather-description">Description</span>
+          </div>
+          <div class="temp-info">
+            <span id="current-temperature">--</span>°C
+          </div>
+          <div class="extra-info">
+            Humidity: <span id="humidity">--</span>% | Wind:
+            <span id="wind">--</span> km/h
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Coded by
+          <a href="https://github.com/yourusername/weather-app" target="_blank"
+            >Banele Gumede</a
+          >
+          |
+          <a href="https://your-app-name.netlify.app" target="_blank"
+            >Live on Netlify</a
+          >
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      function formatDate(date) {
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        let day = days[date.getDay()];
+        let hours = date.getHours().toString().padStart(2, "0");
+        let minutes = date.getMinutes().toString().padStart(2, "0");
+        return `${day} ${hours}:${minutes}`;
+      }
+
+      function updateWeather(response) {
+        const data = response.data;
+        document.querySelector("#current-city").innerText = data.city;
+        document.querySelector("#current-temperature").innerText = Math.round(
+          data.temperature.current
+        );
+        document.querySelector("#humidity").innerText =
+          data.temperature.humidity;
+        document.querySelector("#wind").innerText = Math.round(data.wind.speed);
+        document.querySelector("#weather-description").innerText =
+          data.condition.description;
+        document
+          .querySelector("#weather-icon")
+          .setAttribute("src", data.condition.icon_url);
+        document
+          .querySelector("#weather-icon")
+          .setAttribute("alt", data.condition.description);
+      }
+
+      function searchCity(city) {
+        const apiKey = "b2a5adcct04b33178913oc335f405433";
+        const apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
+        axios.get(apiUrl).then(updateWeather);
+      }
+
+      document
+        .querySelector("#search-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const city = document.querySelector("#search-input").value.trim();
+          if (city) {
+            searchCity(city);
+          }
+        });
+
+      document.querySelector("#current-date").innerText = formatDate(
+        new Date()
+      );
+      searchCity("Paris");
+    </script>
+  </body>
+</html>
